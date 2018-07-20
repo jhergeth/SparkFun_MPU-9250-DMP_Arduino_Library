@@ -1361,7 +1361,8 @@ int mpu_set_sample_rate(unsigned short rate)
         st.chip_cfg.sample_rate = 1000 / (1 + data);
 
 #ifdef AK89xx_SECONDARY
-        mpu_set_compass_sample_rate(min(st.chip_cfg.compass_sample_rate, (unsigned short)MAX_COMPASS_SAMPLE_RATE));
+		mpu_set_compass_sample_rate((st.chip_cfg.compass_sample_rate > MAX_COMPASS_SAMPLE_RATE?MAX_COMPASS_SAMPLE_RATE:st.chip_cfg.compass_sample_rate));
+		// mpu_set_compass_sample_rate(min(st.chip_cfg.compass_sample_rate, MAX_COMPASS_SAMPLE_RATE));
 #endif
 
         /* Automatically set LPF to 1/2 sampling rate. */
