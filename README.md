@@ -5,6 +5,8 @@ SparkFun MPU-9250 Digital Motion Processor (DMP) Arduino Library
 
 [*SparkFun MPU-9250 (SEN-13762)*](https://www.sparkfun.com/products/13762)
 
+Trying to port it to the esp8266 ......
+
 Advanced Arduino library for the Invensense MPU-9250 inertial measurement unit (IMU), which enables the sensor's digital motion processing (DMP) features. Along with configuring and reading from the accelerometer, gyroscope, and magnetometer, this library also supports the chip's DMP features like:
 
 * Quaternion calculation
