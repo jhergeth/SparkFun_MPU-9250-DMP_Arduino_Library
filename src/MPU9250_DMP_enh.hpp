@@ -13,8 +13,8 @@ public:
     boolean isDataAvailable() { boolean b = newData; newData = false; return b;};
     void handleIRQ();   // handle IRQs from MPU9250
 
-    void MahonyQuaternionUpdate(float, float, float, float, float, float, float, float, float, float);
-    void MadgwickQuaternionUpdate(float, float, float, float, float, float, float, float, float, float);
+    void MahonyQuaternionUpdate(float, float, float, float, float, float, float, float, float);
+    void MadgwickQuaternionUpdate(float, float, float, float, float, float, float, float, float);
 
     void calcEulerAngles(float);
 

@@ -114,7 +114,7 @@ const float beta = sqrt(3.0f / 4.0f) * GyroMeasError;   // Compute beta
 // set to a small or zero value
 const float zeta = sqrt(3.0f / 4.0f) * GyroMeasDrift;
 
-void MPU9250_DMP_enh::MadgwickQuaternionUpdate(float ax, float ay, float az, float gx, float gy, float gz, float mx, float my, float mz, float deltat)
+void MPU9250_DMP_enh::MadgwickQuaternionUpdate(float ax, float ay, float az, float gx, float gy, float gz, float mx, float my, float mz)
 {
     // Must be called before updating quaternions!
     updateTime();
@@ -214,7 +214,7 @@ void MPU9250_DMP_enh::MadgwickQuaternionUpdate(float ax, float ay, float az, flo
 
 // Similar to Madgwick scheme but uses proportional and integral filtering on
 // the error between estimated reference vectors and measured ones.
-void MPU9250_DMP_enh::MahonyQuaternionUpdate(float ax, float ay, float az, float gx, float gy, float gz, float mx, float my, float mz, float deltat)
+void MPU9250_DMP_enh::MahonyQuaternionUpdate(float ax, float ay, float az, float gx, float gy, float gz, float mx, float my, float mz)
 {
     // Must be called before updating quaternions!
     updateTime();
