@@ -18,7 +18,14 @@ public:
 
     void calcEulerAngles(float f = 0.0f);
 
-    void MPU9250_DMP_enh::magcalMPU9250();
+    void magcalMPU9250();
+
+    void getMagCalData(float* bi, float* sc){
+        for( int i = 0; i < 3; i++ ){
+            bi[i] = magBias[i];
+            sc[i] = magScale[i];
+        }
+    }
 
     // array to hold acc, gyro and magneto data
     float fmpuD[3][3];
