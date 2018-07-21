@@ -309,7 +309,7 @@ void MPU9250_DMP_enh::MahonyQuaternionUpdate(float ax, float ay, float az, float
     q[3] = q4 * norm;
 }
 
-void MPU9250_DMP_enh::calcEulerAngles(float corDeclination = 0.0){
+void MPU9250_DMP_enh::calcEulerAngles(float corDeclination){
 
     // Define output variables from updated quaternion---these are Tait-Bryan
     // angles, commonly used in aircraft orientation. In this coordinate system,

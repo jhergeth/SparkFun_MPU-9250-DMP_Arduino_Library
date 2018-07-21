@@ -16,7 +16,7 @@ public:
     void MahonyQuaternionUpdate(float, float, float, float, float, float, float, float, float);
     void MadgwickQuaternionUpdate(float, float, float, float, float, float, float, float, float);
 
-    void calcEulerAngles(float);
+    void calcEulerAngles(float f = 0.0f);
 
     // array to hold acc, gyro and magneto data
     float fmpuD[3][3];
