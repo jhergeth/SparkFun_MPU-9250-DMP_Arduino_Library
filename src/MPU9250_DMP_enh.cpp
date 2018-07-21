@@ -6,6 +6,8 @@ MPU9250_DMP_enh::MPU9250_DMP_enh(){
     sumCount = 0;
     tapDir = tapCnt = 0;
     memset(fmpuD, 0, sizeof(fmpuD));
+    memset(magBias, 0, sizeof(magBias));
+    memset(magScale, 0, sizeof(magScale));
 }
 
 void MPU9250_DMP_enh::handleIRQ(){
@@ -57,6 +59,57 @@ void MPU9250_DMP_enh::readMPU(){
     fmpuD[IMUm][1] = calcMag(my); // magY is y-axis magnetic field in uT
     fmpuD[IMUm][2] = calcMag(mz); // magZ is z-axis magnetic field in uT
     newData = true;
+}
+
+void MPU9250_DMP_enh::magcalMPU9250()
+{
+    uint16_t ii = 0, sample_count = 0, del = 1;
+    int32_t mag_scale[3] = {0, 0, 0};
+    int16_t mag_max[3] = {-32767, -32767, -32767}, mag_min[3] = {32767, 32767, 32767};
+
+    // shoot for ~fifteen seconds of mag data
+    if(getCompassSampleRate() < 50){
+        sample_count = 128;  // at 8 Hz ODR, new mag data is available every 125 ms
+        del = 135;
+    }
+    else{
+        sample_count = 1500;  // at 100 Hz ODR, new mag data is available every 10 ms
+        del = 12;
+    }
+
+    for(ii = 0; ii < sample_count; ii++) {
+        update(UPDATE_COMPASS);
+        mag_max[0] = max(mag_max[0], mx);
+        mag_min[0] = min(mag_min[0], mx);
+        mag_max[1] = max(mag_max[1], my);
+        mag_min[1] = min(mag_min[1], my);
+        mag_max[2] = max(mag_max[2], mz);
+        mag_min[2] = min(mag_min[2], mz);
+        delay(del);
+    }
+
+
+    // Get hard iron correction
+    // get internal correction data
+    short intMagCal[3];
+    mpu_get_compass_sense_adj(intMagCal);
+
+    for(ii = 0; ii < 3; ii++ ){
+        float mBias = (mag_max[ii] + mag_min[ii])/2.0f;  // get average x mag bias in counts
+        magBias[ii] = mBias * getMagSens() * ((float)intMagCal[ii]/256.0f);
+    }
+
+    // Get soft iron correction estimate
+    mag_scale[0]  = (mag_max[0] - mag_min[0])/2;  // get average x axis max chord length in counts
+    mag_scale[1]  = (mag_max[1] - mag_min[1])/2;  // get average y axis max chord length in counts
+    mag_scale[2]  = (mag_max[2] - mag_min[2])/2;  // get average z axis max chord length in counts
+
+    float avg_rad = mag_scale[0] + mag_scale[1] + mag_scale[2];
+    avg_rad /= 3.0;
+
+    magScale[0] = avg_rad/((float)mag_scale[0]);
+    magScale[1] = avg_rad/((float)mag_scale[1]);
+    magScale[2] = avg_rad/((float)mag_scale[2]);
 }
 
 

@@ -18,6 +18,8 @@ public:
 
     void calcEulerAngles(float f = 0.0f);
 
+    void MPU9250_DMP_enh::magcalMPU9250();
+
     // array to hold acc, gyro and magneto data
     float fmpuD[3][3];
     // array to hold Euler angles
@@ -40,8 +42,9 @@ private:
     // Vector to hold integral error for Mahony method
     float eInt[3] = {0.0f, 0.0f, 0.0f};
 
-
-
+    // vectors to hold user magnetic field correction
+    float magBias[3];
+    float magScale[3];
 };
 
 #endif

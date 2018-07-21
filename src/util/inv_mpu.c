@@ -2965,6 +2965,19 @@ static int setup_compass(void)
 #endif
 
 /**
+ *  @brief      Read compass sensitivity adjustments
+ *  @param[out] data        Raw data in hardware units. 3 shorts
+ *  @return     0 if successful.
+ */
+int mpu_get_compass_sense_adj(short *data){
+    data[0] = st.chip_cfg.mag_sens_adj[0];
+    data[1] = st.chip_cfg.mag_sens_adj[1];
+    data[2] = st.chip_cfg.mag_sens_adj[2];
+    return 0;
+}
+
+
+/**
  *  @brief      Read raw compass data.
  *  @param[out] data        Raw data in hardware units.
  *  @param[out] timestamp   Timestamp in milliseconds. Null if not needed.
