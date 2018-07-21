@@ -8,7 +8,7 @@
 #define IMUm    2       // magnetometer
 #define IMUw    3       // euler angles
 
-class MPU9250_DMP_enh : MPU9250_DMP {
+class MPU9250_DMP_enh : public MPU9250_DMP {
 public:
     MPU9250_DMP_enh();
     boolean isDataAvailable() { boolean b = newData; newData = false; return b;};
