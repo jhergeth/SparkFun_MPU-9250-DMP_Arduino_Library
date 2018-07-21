@@ -1,5 +1,9 @@
 #include <arduino.h>
+#include <limits.h>
 #include "MPU9250_DMP_enh.hpp"
+
+// #define min(a,b)    ((a>b)?b:a)
+// #define max(a,b)    ((a>b)?a:b)
 
 MPU9250_DMP_enh::MPU9250_DMP_enh(){
     newData = false;
@@ -65,7 +69,7 @@ void MPU9250_DMP_enh::magcalMPU9250()
 {
     uint16_t ii = 0, sample_count = 0, del = 1;
     int32_t mag_scale[3] = {0, 0, 0};
-    int16_t mag_max[3] = {-32767, -32767, -32767}, mag_min[3] = {32767, 32767, 32767};
+    int mag_max[3] = {INT_MIN, INT_MIN, INT_MIN}, mag_min[3] = {INT_MAX, INT_MAX, INT_MAX};
 
     // shoot for ~fifteen seconds of mag data
     if(getCompassSampleRate() < 50){
