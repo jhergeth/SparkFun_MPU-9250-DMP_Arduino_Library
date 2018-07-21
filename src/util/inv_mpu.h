@@ -84,6 +84,7 @@ int mpu_get_accel_fsr(unsigned char *fsr);
 int mpu_set_accel_fsr(unsigned char fsr);
 
 int mpu_get_compass_fsr(unsigned short *fsr);
+int mpu_get_compass_sense_adj(short *data);
 
 int mpu_get_gyro_sens(float *sens);
 int mpu_get_accel_sens(unsigned short *sens);
@@ -132,4 +133,3 @@ int mpu_run_6500_self_test(long *gyro, long *accel, unsigned char debug);
 int mpu_register_tap_cb(void (*func)(unsigned char, unsigned char));
 
 #endif  /* #ifndef _INV_MPU_H_ */
-
