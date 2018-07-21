@@ -6,7 +6,6 @@
 #define IMUa    0       // accel
 #define IMUg    1       // gyro
 #define IMUm    2       // magnetometer
-#define IMUw    3       // euler angles
 
 class MPU9250_DMP_enh : public MPU9250_DMP {
 public:
@@ -14,8 +13,20 @@ public:
     boolean isDataAvailable() { boolean b = newData; newData = false; return b;};
     void handleIRQ();   // handle IRQs from MPU9250
 
-    float fmpuD[4][3];
+    void MahonyQuaternionUpdate(float, float, float, float, float, float, float, float, float, float);
+    void MadgwickQuaternionUpdate(float, float, float, float, float, float, float, float, float, float);
+
+    void calcEulerAngles(float);
+
+    // array to hold acc, gyro and magneto data
+    float fmpuD[3][3];
+    // array to hold Euler angles
+    float fEuler[3];
+    // Vector to hold quaternion
+    float q[4] = {1.0f, 0.0f, 0.0f, 0.0f};
+
     int tapDir, tapCnt;
+
 private:
     void readMPU();     // read accel, gyro and magneto data
     void updateTime();
@@ -25,6 +36,10 @@ private:
     uint32_t lastUpdate = 0, firstUpdate = 0; // used to calculate integration interval
     uint32_t now = 0;        // used to calculate integration interval
     uint32_t sumCount = 0;        // used to calculate integration interval
+
+    // Vector to hold integral error for Mahony method
+    float eInt[3] = {0.0f, 0.0f, 0.0f};
+
 
 
 };
