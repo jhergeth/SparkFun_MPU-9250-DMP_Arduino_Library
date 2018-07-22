@@ -14,11 +14,19 @@ MPU9250_DMP_enh::MPU9250_DMP_enh(){
     memset(magScale, 0, sizeof(magScale));
 }
 
-void MPU9250_DMP_enh::handleIRQ(){
-    readMPU();
+short MPU9250_DMP_enh::handleIRQ(){
+    short res = 0;
+
+    short status;
+    mpu_get_int_status(&status);
+    if(status & 0x001){   // data available
+        readMPU();
+        res = 1;
+    }
     // Check for new data in the FIFO
     if ( fifoAvailable() )
     {
+        res |= 0x02;
         // DMP FIFO must be updated in order to update tap data
         dmpUpdateFifo();
         // Check for new tap data by polling tapAvailable
@@ -28,8 +36,10 @@ void MPU9250_DMP_enh::handleIRQ(){
             // by reading getTapDir and getTapCount
             tapDir = getTapDir();
             tapCnt = getTapCount();
+            res |= 0x04;
         }
     }
+    return res;
 }
 
 void MPU9250_DMP_enh::updateTime(){

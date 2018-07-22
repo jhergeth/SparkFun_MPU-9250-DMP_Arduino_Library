@@ -11,7 +11,7 @@ class MPU9250_DMP_enh : public MPU9250_DMP {
 public:
     MPU9250_DMP_enh();
     boolean isDataAvailable() { boolean b = newData; newData = false; return b;};
-    void handleIRQ();   // handle IRQs from MPU9250
+    short handleIRQ();   // handle IRQs from MPU9250
 
     void MahonyQuaternionUpdate(float, float, float, float, float, float, float, float, float);
     void MadgwickQuaternionUpdate(float, float, float, float, float, float, float, float, float);
