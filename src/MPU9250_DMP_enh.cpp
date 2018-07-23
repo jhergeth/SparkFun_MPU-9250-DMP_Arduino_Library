@@ -23,6 +23,11 @@ short MPU9250_DMP_enh::handleIRQ(){
         readMPU();
         res = 1;
     }
+    return res;
+}
+
+short MPU9250_DMP::handleFIFOIRQ(){
+    short res = 0;
     // Check for new data in the FIFO
     if ( fifoAvailable() )
     {
