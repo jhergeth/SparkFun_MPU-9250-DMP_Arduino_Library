@@ -34,6 +34,9 @@ public:
         }
     }
 
+    float getUpdateRate(){
+        return (float)sumCount/sum;
+    }
     // array to hold acc, gyro and magneto data
     float fmpuD[3][3];
     // array to hold Euler angles
