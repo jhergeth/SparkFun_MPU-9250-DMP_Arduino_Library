@@ -36,7 +36,8 @@ public:
     }
 
     float getUpdateRate(){
-        return (float)sumCount/sum;
+//        return (float)sumCount/sum;
+        return 1000.0f/deltat;
     }
     // array to hold acc, gyro and magneto data
     float fmpuD[3][3];
