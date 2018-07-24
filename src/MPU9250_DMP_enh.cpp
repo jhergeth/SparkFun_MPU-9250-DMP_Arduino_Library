@@ -77,10 +77,10 @@ short MPU9250_DMP_enh::calAccelGyro(float *accelB, float *gyroB){
     int16_t j = 0;
     configureFifo(INV_XYZ_GYRO | INV_XYZ_ACCEL);
     do{
-        delay(1);
+        delay(10);
         cnt++;
         j = fifoAvailable();
-    }while(j <= 40*12 && cnt < 2000);
+    }while(j <= 40*12 && cnt < 200);
 
     int16_t packetCnt = j/12;  // 3*2 + 3*2 bytes / package
     if(j < 40*12){
@@ -109,10 +109,10 @@ short MPU9250_DMP_enh::calAccelGyro(float *accelB, float *gyroB){
     else {accelBias[2] += (int32_t) accelsensitivity;}
 
     for(uint16_t i = 0; i < 3; i++){
-        *accelB++ = (float)accelBias[i] * (float)accelsensitivity;
+        *accelB++ = (float)accelBias[i] / (float)accelsensitivity;
     }
     for(uint16_t i = 0; i < 3; i++){
-        *gyroB++ = (float)gyroBias[i] * (float)gyrosensitivity;
+        *gyroB++ = (float)gyroBias[i] / (float)gyrosensitivity;
     }
 
     gyroBias[0] /= -4;      // divide by 4 for 1000g full scale range (we measured with 256 g fsr)
