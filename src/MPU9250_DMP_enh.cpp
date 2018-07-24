@@ -58,7 +58,7 @@ void MPU9250_DMP_enh::updateTime(){
     sumCount++;
 }
 
-short MPU9250_DMP_enh::calAccelGyro(float *gyroB, float *accelB){
+short MPU9250_DMP_enh::calAccelGyro(float *accelB, float *gyroB){
     begin();                // reset devices
     setLPF(188);            // set low-pass filter to 188 Hz
     setSampleRate(1000);    // set sample rate to 1kHz
@@ -78,7 +78,8 @@ short MPU9250_DMP_enh::calAccelGyro(float *gyroB, float *accelB){
     long accelBias[3] = {0,0,0};
     long gyroBias[3] = {0,0,0};
 
-    for( uint16_t i = bytes = 0; i < packetCnt; i++){
+    uint16_t j = 0;
+    for( uint16_t i = j = 0; i < packetCnt; i++){
         if(updateFifo() == INV_SUCCESS){
             accelBias[0] += ax;
             accelBias[1] += ay;
@@ -86,10 +87,12 @@ short MPU9250_DMP_enh::calAccelGyro(float *gyroB, float *accelB){
             gyroBias[0] += gx;
             gyroBias[1] += gy;
             gyroBias[2] += gz;
-            bytes++;
+            j++;
         }
     }
-    if(bytes <= 0){
+    if(j <= 0){
+        accelB[0] = bytes;
+        accelB[1] = j;
         return INV_ERROR;
     }
 
