@@ -60,6 +60,8 @@ void MPU9250_DMP_enh::updateTime(){
 
 short MPU9250_DMP_enh::calAccelGyro(float *accelB, float *gyroB){
     begin();                // reset devices
+
+    setSensors(INV_XYZ_GYRO | INV_XYZ_ACCEL); // Enable all sensors
     setLPF(188);            // set low-pass filter to 188 Hz
     setSampleRate(1000);    // set sample rate to 1kHz
     setGyroFSR(250);        // set gyro full scale range to 250 deg/setClock
@@ -68,7 +70,6 @@ short MPU9250_DMP_enh::calAccelGyro(float *accelB, float *gyroB){
     uint16_t  gyrosensitivity  = 131;   // = 131 LSB/degrees/sec
     uint16_t  accelsensitivity = 16384;  // = 16384 LSB/g
 
-    setSensors(INV_XYZ_GYRO | INV_XYZ_ACCEL); // Enable all sensors
     long accelBias[3] = {0,0,0};
     long gyroBias[3] = {0,0,0};
     int16_t cnt = 0;
