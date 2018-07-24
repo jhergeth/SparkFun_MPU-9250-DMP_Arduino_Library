@@ -68,24 +68,13 @@ short MPU9250_DMP_enh::calAccelGyro(float *accelB, float *gyroB){
     uint16_t  gyrosensitivity  = 131;   // = 131 LSB/degrees/sec
     uint16_t  accelsensitivity = 16384;  // = 16384 LSB/g
 
-    resetFifo();
-    configureFifo(INV_XYZ_ACCEL | INV_XYZ_GYRO);
-    int16_t bytes, cnt = 0;
-    do{
-        delay(40);
-        bytes = fifoAvailable();
-        cnt++;
-    }while(bytes < 40*12 && cnt < 20);
-
-    configureFifo(0);       // disable fifo
-    int16_t packetCnt = bytes/12;  // 3*2 + 3*2 bytes / package
-
     long accelBias[3] = {0,0,0};
     long gyroBias[3] = {0,0,0};
-
+    int16_t cnt = 0;
     int16_t j = 0;
-    for( int16_t i = j = 0; i < packetCnt; i++){
-        if(updateFifo() == INV_SUCCESS){
+    do{
+        delay(1);
+        if(update(INV_XYZ_ACCEL | INV_XYZ_GYRO) == INV_SUCCESS){
             accelBias[0] += ax;
             accelBias[1] += ay;
             accelBias[2] += az;
@@ -94,20 +83,24 @@ short MPU9250_DMP_enh::calAccelGyro(float *accelB, float *gyroB){
             gyroBias[2] += gz;
             j++;
         }
-    }
-    if(j <= 0){
-        accelB[0] = bytes;
-        accelB[1] = j;
-        accelB[1] = cnt;
+        cnt++;
+    }while(j < 40 && cnt < 20);
+
+    int16_t packetCnt = j;  // 3*2 + 3*2 bytes / package
+
+    if(j < 40){
+        accelB[0] = j;
+        accelB[1] = packetCnt;
+        accelB[1] = 0;
         return INV_ERROR;
     }
 
-    accelBias[0] /= (int32_t)bytes;
-    accelBias[1] /= (int32_t)bytes;
-    accelBias[2] /= (int32_t)bytes;
-    gyroBias[0] /= (int32_t)bytes;
-    gyroBias[1] /= (int32_t)bytes;
-    gyroBias[2] /= (int32_t)bytes;
+    accelBias[0] /= (int32_t)packetCnt;
+    accelBias[1] /= (int32_t)packetCnt;
+    accelBias[2] /= (int32_t)packetCnt;
+    gyroBias[0] /= (int32_t)packetCnt;
+    gyroBias[1] /= (int32_t)packetCnt;
+    gyroBias[2] /= (int32_t)packetCnt;
 
     if(accelBias[2] > 0L) {accelBias[2] -= (int32_t) accelsensitivity;}  // Remove gravity from the z-axis accelerometer bias calculation
     else {accelBias[2] += (int32_t) accelsensitivity;}
