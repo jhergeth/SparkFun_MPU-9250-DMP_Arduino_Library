@@ -68,18 +68,23 @@ short MPU9250_DMP_enh::calAccelGyro(float *accelB, float *gyroB){
     uint16_t  gyrosensitivity  = 131;   // = 131 LSB/degrees/sec
     uint16_t  accelsensitivity = 16384;  // = 16384 LSB/g
 
+    resetFifo();
     configureFifo(INV_XYZ_ACCEL | INV_XYZ_GYRO);
-    delay(40);              // wait for 40 samples (1kHz rate!)
+    int16_t bytes, cnt = 0;
+    do{
+        delay(40);
+        bytes = fifoAvailable();
+        cnt++;
+    }while(bytes < 40*12 && cnt < 20);
 
     configureFifo(0);       // disable fifo
-    uint16_t bytes = fifoAvailable();
-    uint16_t packetCnt = bytes/12;  // 3*2 + 3*2 bytes / package
+    int16_t packetCnt = bytes/12;  // 3*2 + 3*2 bytes / package
 
     long accelBias[3] = {0,0,0};
     long gyroBias[3] = {0,0,0};
 
-    uint16_t j = 0;
-    for( uint16_t i = j = 0; i < packetCnt; i++){
+    int16_t j = 0;
+    for( int16_t i = j = 0; i < packetCnt; i++){
         if(updateFifo() == INV_SUCCESS){
             accelBias[0] += ax;
             accelBias[1] += ay;
@@ -93,6 +98,7 @@ short MPU9250_DMP_enh::calAccelGyro(float *accelB, float *gyroB){
     if(j <= 0){
         accelB[0] = bytes;
         accelB[1] = j;
+        accelB[1] = cnt;
         return INV_ERROR;
     }
 
