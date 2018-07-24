@@ -86,7 +86,7 @@ short MPU9250_DMP_enh::calAccelGyro(float *accelB, float *gyroB){
             j++;
         }
         cnt++;
-    }while(j < 40 && cnt < 20);
+    }while(j < 40 && cnt < 2000);
 
     int16_t packetCnt = j;  // 3*2 + 3*2 bytes / package
 
