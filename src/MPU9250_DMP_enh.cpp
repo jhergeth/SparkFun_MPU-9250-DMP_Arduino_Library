@@ -70,33 +70,34 @@ short MPU9250_DMP_enh::calAccelGyro(float *accelB, float *gyroB){
     uint16_t  gyrosensitivity  = 131;   // = 131 LSB/degrees/sec
     uint16_t  accelsensitivity = 16384;  // = 16384 LSB/g
 
+
     long accelBias[3] = {0,0,0};
     long gyroBias[3] = {0,0,0};
     int16_t cnt = 0;
     int16_t j = 0;
+    configureFifo(INV_XYZ_GYRO | INV_XYZ_ACCEL);
     do{
         delay(1);
-        if(update(INV_XYZ_ACCEL | INV_XYZ_GYRO) == INV_SUCCESS){
-            accelBias[0] += ax;
-            accelBias[1] += ay;
-            accelBias[2] += az;
-            gyroBias[0] += gx;
-            gyroBias[1] += gy;
-            gyroBias[2] += gz;
-            j++;
-        }
         cnt++;
-    }while(j < 40 && cnt < 2000);
+        j = fifoAvailable();
+    }while(j <= 40*12 && cnt < 2000);
 
-    int16_t packetCnt = j;  // 3*2 + 3*2 bytes / package
-
-    if(j < 40){
+    int16_t packetCnt = j/12;  // 3*2 + 3*2 bytes / package
+    if(j < 40*12){
         accelB[0] = j;
         accelB[1] = packetCnt;
         accelB[1] = 0;
         return INV_ERROR;
     }
-
+    for(j = 0; j < packetCnt; j++){
+        updateFifo();
+        accelBias[0] += ax;
+        accelBias[1] += ay;
+        accelBias[2] += az;
+        gyroBias[0] += gx;
+        gyroBias[1] += gy;
+        gyroBias[2] += gz;
+    }
     accelBias[0] /= (int32_t)packetCnt;
     accelBias[1] /= (int32_t)packetCnt;
     accelBias[2] /= (int32_t)packetCnt;
