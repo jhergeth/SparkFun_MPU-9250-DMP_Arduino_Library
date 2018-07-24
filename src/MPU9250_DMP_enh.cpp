@@ -68,13 +68,13 @@ short MPU9250_DMP_enh::calAccelGyro(float *accelB, float *gyroB){
     uint16_t  gyrosensitivity  = 131;   // = 131 LSB/degrees/sec
     uint16_t  accelsensitivity = 16384;  // = 16384 LSB/g
 
-    delay(200);
+    setSensors(INV_XYZ_GYRO | INV_XYZ_ACCEL); // Enable all sensors
     long accelBias[3] = {0,0,0};
     long gyroBias[3] = {0,0,0};
     int16_t cnt = 0;
     int16_t j = 0;
     do{
-        delay(10);
+        delay(1);
         if(update(INV_XYZ_ACCEL | INV_XYZ_GYRO) == INV_SUCCESS){
             accelBias[0] += ax;
             accelBias[1] += ay;
