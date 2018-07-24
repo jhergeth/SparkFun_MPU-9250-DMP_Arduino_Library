@@ -58,6 +58,64 @@ void MPU9250_DMP_enh::updateTime(){
     sumCount++;
 }
 
+short MPU9250_DMP_enh::calAccelGyro(float *gyroB, float *accelB){
+    begin();                // reset devices
+    setLPF(188);            // set low-pass filter to 188 Hz
+    setSampleRate(1000);    // set sample rate to 1kHz
+    setGyroFSR(250);        // set gyro full scale range to 250 deg/setClock
+    setAccelFSR(2);         // set accel full scale range to 2 G
+
+    uint16_t  gyrosensitivity  = 131;   // = 131 LSB/degrees/sec
+    uint16_t  accelsensitivity = 16384;  // = 16384 LSB/g
+
+    configureFifo(INV_XYZ_ACCEL | INV_XYZ_GYRO);
+    delay(40);              // wait for 40 samples (1kHz rate!)
+
+    configureFifo(0);       // disable fifo
+    uint16_t bytes = fifoAvailable();
+    uint16_t packetCnt = bytes/12;  // 3*2 + 3*2 bytes / package
+
+    long accelBias[3] = {0,0,0};
+    long gyroBias[3] = {0,0,0};
+
+    for( uint16_t i = 0; i < packetCnt; i++){
+        updateFifo();
+        accelBias[0] += ax;
+        accelBias[1] += ay;
+        accelBias[2] += az;
+        gyroBias[0] += gx;
+        gyroBias[1] += gy;
+        gyroBias[2] += gz;
+    }
+    accelBias[0] /= (int32_t)packetCnt;
+    accelBias[1] /= (int32_t)packetCnt;
+    accelBias[2] /= (int32_t)packetCnt;
+    gyroBias[0] /= (int32_t)packetCnt;
+    gyroBias[1] /= (int32_t)packetCnt;
+    gyroBias[2] /= (int32_t)packetCnt;
+
+    if(accelBias[2] > 0L) {accelBias[2] -= (int32_t) accelsensitivity;}  // Remove gravity from the z-axis accelerometer bias calculation
+    else {accelBias[2] += (int32_t) accelsensitivity;}
+
+    for(uint16_t i = 0; i < 3; i++){
+        *gyroB++ = (float)gyroBias[i] * (float)gyrosensitivity;
+    }
+    gyroBias[0] /= -4;      // divide by 4 for 1000g full scale range (we measured with 256 g fsr)
+    gyroBias[1] /= -4;      // and change sign because it has to be subtracted!
+    gyroBias[2] /= -4;
+    mpu_set_gyro_bias_reg(gyroBias);
+
+    for(uint16_t i = 0; i < 3; i++){
+        accelBias[i] /= -8; // divide by 8 for 16g fsr and apply sign
+    }
+    mpu_set_accel_bias_6500_reg(accelBias);
+
+    for(uint16_t i = 0; i < 3; i++){
+        *accelB++ = (float)accelBias[i] * (float)accelsensitivity;
+    }
+    return 0;
+}
+
 void MPU9250_DMP_enh::readMPU(){
     // Call update() to update the imu objects sensor data. You can specify
     // which sensors to update by OR'ing UPDATE_ACCEL, UPDATE_GYRO,

@@ -13,6 +13,7 @@ public:
     boolean isDataAvailable() { boolean b = newData; newData = false; return b;};
     short handleIRQ();   // handle IRQs from MPU9250
     short handleFIFOIRQ();
+    short calAccelGyro(float*, float*);
 
     void MahonyQuaternionUpdate(float, float, float, float, float, float, float, float, float);
     void MadgwickQuaternionUpdate(float, float, float, float, float, float, float, float, float);
