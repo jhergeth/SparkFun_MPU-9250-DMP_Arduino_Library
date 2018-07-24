@@ -653,6 +653,17 @@ int mpu_init(struct int_param_s *int_param)
         return -1;
     delay_ms(100);
 
+    /* taken from Kris Winers code ..... */
+    data[0] = 0x01;
+    if (i2c_write(st.hw->addr, st.reg->pwr_mgmt_1, 1, data))
+        return -1;
+    data[0] = 0x00;
+    if (i2c_write(st.hw->addr, st.reg->pwr_mgmt_2, 1, data))
+        return -1;
+    delay(200);
+    set_int_enable(false);
+    mpu_reset_fifo();
+
     /* Wake up chip. */
     data[0] = 0x00;
     if (i2c_write(st.hw->addr, st.reg->pwr_mgmt_1, 1, data))
