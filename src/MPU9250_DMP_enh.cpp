@@ -78,28 +78,38 @@ short MPU9250_DMP_enh::calAccelGyro(float *gyroB, float *accelB){
     long accelBias[3] = {0,0,0};
     long gyroBias[3] = {0,0,0};
 
-    for( uint16_t i = 0; i < packetCnt; i++){
-        updateFifo();
-        accelBias[0] += ax;
-        accelBias[1] += ay;
-        accelBias[2] += az;
-        gyroBias[0] += gx;
-        gyroBias[1] += gy;
-        gyroBias[2] += gz;
+    for( uint16_t i = bytes = 0; i < packetCnt; i++){
+        if(updateFifo() == INV_SUCCESS){
+            accelBias[0] += ax;
+            accelBias[1] += ay;
+            accelBias[2] += az;
+            gyroBias[0] += gx;
+            gyroBias[1] += gy;
+            gyroBias[2] += gz;
+            bytes++;
+        }
     }
-    accelBias[0] /= (int32_t)packetCnt;
-    accelBias[1] /= (int32_t)packetCnt;
-    accelBias[2] /= (int32_t)packetCnt;
-    gyroBias[0] /= (int32_t)packetCnt;
-    gyroBias[1] /= (int32_t)packetCnt;
-    gyroBias[2] /= (int32_t)packetCnt;
+    if(bytes <= 0){
+        return INV_ERROR;
+    }
+
+    accelBias[0] /= (int32_t)bytes;
+    accelBias[1] /= (int32_t)bytes;
+    accelBias[2] /= (int32_t)bytes;
+    gyroBias[0] /= (int32_t)bytes;
+    gyroBias[1] /= (int32_t)bytes;
+    gyroBias[2] /= (int32_t)bytes;
 
     if(accelBias[2] > 0L) {accelBias[2] -= (int32_t) accelsensitivity;}  // Remove gravity from the z-axis accelerometer bias calculation
     else {accelBias[2] += (int32_t) accelsensitivity;}
 
     for(uint16_t i = 0; i < 3; i++){
+        *accelB++ = (float)accelBias[i] * (float)accelsensitivity;
+    }
+    for(uint16_t i = 0; i < 3; i++){
         *gyroB++ = (float)gyroBias[i] * (float)gyrosensitivity;
     }
+
     gyroBias[0] /= -4;      // divide by 4 for 1000g full scale range (we measured with 256 g fsr)
     gyroBias[1] /= -4;      // and change sign because it has to be subtracted!
     gyroBias[2] /= -4;
@@ -110,10 +120,7 @@ short MPU9250_DMP_enh::calAccelGyro(float *gyroB, float *accelB){
     }
     mpu_set_accel_bias_6500_reg(accelBias);
 
-    for(uint16_t i = 0; i < 3; i++){
-        *accelB++ = (float)accelBias[i] * (float)accelsensitivity;
-    }
-    return 0;
+    return INV_SUCCESS;
 }
 
 void MPU9250_DMP_enh::readMPU(){
