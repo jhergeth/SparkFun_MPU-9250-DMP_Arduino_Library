@@ -43,6 +43,10 @@ inv_error_t MPU9250_DMP::begin(void)
 
 //	Wire.begin();
 
+	result = selfTest();
+	if( result != 0x07 )
+		return result;
+
 	result = mpu_init(&int_param);
 
 	if (result)
