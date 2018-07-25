@@ -657,7 +657,7 @@ int mpu_init(struct int_param_s *int_param)
     data[0] = 0x01;
     if (i2c_write(st.hw->addr, st.reg->pwr_mgmt_1, 1, data))
         return -1;
-    data[0] = 0x00;
+    data[0] = BIT_STBY_XYZA | BIT_STBY_XYZG;        // disable all sensors
     if (i2c_write(st.hw->addr, st.reg->pwr_mgmt_2, 1, data))
         return -1;
     delay(200);
