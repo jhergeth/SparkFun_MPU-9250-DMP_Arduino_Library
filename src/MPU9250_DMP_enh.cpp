@@ -115,13 +115,13 @@ short MPU9250_DMP_enh::calAccelGyro(float *accelB, float *gyroB){
         *gyroB++ = (float)gyroBias[i] / (float)gyrosensitivity;
     }
 
-    gyroBias[0] /= -4;      // divide by 4 for 1000g full scale range (we measured with 256 g fsr)
-    gyroBias[1] /= -4;      // and change sign because it has to be subtracted!
-    gyroBias[2] /= -4;
+    gyroBias[0] /= 4;      // divide by 4 for 1000g full scale range (we measured with 256 g fsr)
+    gyroBias[1] /= 4;      // and change sign because it has to be subtracted!
+    gyroBias[2] /= 4;
     mpu_set_gyro_bias_reg(gyroBias);
 
     for(uint16_t i = 0; i < 3; i++){
-        accelBias[i] /= -8; // divide by 8 for 16g fsr and apply sign
+        accelBias[i] /= 8; // divide by 8 for 16g fsr and apply sign
     }
     mpu_set_accel_bias_6500_reg(accelBias);
 
